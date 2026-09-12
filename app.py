@@ -181,6 +181,7 @@ if st.session_state["theme"] == "Dark":
     .stApp input::placeholder, .stApp textarea::placeholder { color: #b8b0aa !important; opacity: 1 !important; }
     .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *,
     .stApp [data-baseweb="textarea"] * { color: #ffffff !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] * { background: #202328 !important; color: #ffffff !important; }
     .stApp [data-baseweb="select"] > div > div,
     .stApp [data-baseweb="select"] > div > div > div { background: #202328 !important; color: #ffffff !important; }
     .stApp [data-baseweb="select"] svg { fill: #ffffff !important; color: #ffffff !important; }
@@ -201,6 +202,9 @@ if st.session_state["theme"] == "Dark":
     .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-size: 1.45rem !important; }
     .stApp .stButton > button { background: #24272c !important; color: #ffffff !important; border-color: #60666e !important; }
     .stApp .stButton > button[kind="primary"] { background: #e97855 !important; color: #ffffff !important; border-color: #e97855 !important; }
+    [data-testid="stElementToolbar"], [data-testid="stElementToolbar"] button,
+    [data-testid="stElementToolbar"] > div { background: #24272c !important; color: #ffffff !important; border-color: #60666e !important; }
+    [data-testid="stElementToolbar"] svg { fill: #ffffff !important; color: #ffffff !important; }
     </style>""", unsafe_allow_html=True)
 else:
     st.markdown("""<style>
@@ -217,11 +221,11 @@ else:
     .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp p,
     .stApp label, .stApp li, .stApp span, .stApp small { color: #202124 !important; }
     .stApp .hero {
-        background: linear-gradient(135deg, #24262a 0%, #422b23 100%) !important;
-        border: 1px solid #704638 !important;
+        background: #fffdfa !important;
+        border: 1px solid #dfd5cc !important;
     }
-    .stApp .hero h1, .stApp .hero p { color: #ffffff !important; }
-    .stApp .hero .eyebrow { color: #ff896b !important; }
+    .stApp .hero h1, .stApp .hero p { color: #202124 !important; }
+    .stApp .hero .eyebrow { color: #c65335 !important; }
     .stApp .card, .stApp div[data-testid="stMetric"],
     .stApp [data-testid="stExpander"] details,
     .stApp [data-testid="stExpander"] summary {
@@ -248,6 +252,7 @@ else:
     .stApp input::placeholder, .stApp textarea::placeholder { color: #7c858d !important; opacity: 1 !important; }
     .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *,
     .stApp [data-baseweb="textarea"] * { color: #202124 !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] * { background: #fffdfa !important; color: #202124 !important; }
     .stApp [data-baseweb="select"] > div > div,
     .stApp [data-baseweb="select"] > div > div > div { background: #fffdfa !important; color: #202124 !important; }
     .stApp [data-baseweb="select"] svg { fill: #202124 !important; color: #202124 !important; }
@@ -268,6 +273,9 @@ else:
     .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-size: 1.45rem !important; }
     .stApp .stButton > button { background: #fffdfa !important; color: #202124 !important; border-color: #dfd5cc !important; }
     .stApp .stButton > button[kind="primary"] { background: #e97855 !important; color: #ffffff !important; border-color: #e97855 !important; }
+    [data-testid="stElementToolbar"], [data-testid="stElementToolbar"] button,
+    [data-testid="stElementToolbar"] > div { background: #fffdfa !important; color: #30343a !important; border-color: #cfc7c0 !important; }
+    [data-testid="stElementToolbar"] svg { fill: #30343a !important; color: #30343a !important; }
     </style>""", unsafe_allow_html=True)
 
 
@@ -300,8 +308,8 @@ if st.session_state["theme"] == "Dark":
 else:
     st.markdown("""<style>
     div[data-testid="stAppViewContainer"] div.hero h1,
-    div[data-testid="stAppViewContainer"] div.hero p { color: #ffffff !important; }
-    div[data-testid="stAppViewContainer"] div.hero .eyebrow { color: #ff896b !important; }
+    div[data-testid="stAppViewContainer"] div.hero p { color: #202124 !important; }
+    div[data-testid="stAppViewContainer"] div.hero .eyebrow { color: #c65335 !important; }
     div[data-testid="stAppViewContainer"] div.card,
     div[data-testid="stAppViewContainer"] div[data-testid="stMetric"],
     div[data-testid="stAppViewContainer"] div[data-testid="stExpander"] {
