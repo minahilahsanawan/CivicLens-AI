@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.py[cod]
+.streamlit/secrets.toml
+complaints.db
+uploads/*
+!uploads/.gitkeep
+.venv/
+venv/
+.DS_Store

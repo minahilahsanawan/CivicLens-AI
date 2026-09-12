@@ -1,0 +1,35 @@
+DEPARTMENT: Public Works and Roads
+KEYWORDS: pothole, road damage, cracked road, sinkhole, broken pavement, sidewalk, footpath, curb
+RESPONSIBILITIES: Inspect, barricade, repair, and maintain public roads, potholes, sidewalks, curbs, and drainage-related road damage.
+PRIORITY RULE: A deep pothole, sinkhole, exposed rebar, or road hazard near traffic is high severity and should be escalated quickly.
+STANDARD ACTION: Create a location-based work order, inspect the site, place temporary safety controls, then schedule permanent repair.
+
+DEPARTMENT: Street Lighting and Electrical Services
+KEYWORDS: streetlight, lamp post, light pole, dark street, electrical box, exposed wire, flickering light
+RESPONSIBILITIES: Maintain public streetlights, lamp posts, lighting controls, and public electrical fixtures.
+PRIORITY RULE: Exposed wiring, sparks, a fallen pole, or an energized hazard is high severity and requires immediate isolation.
+STANDARD ACTION: Dispatch an electrical crew, isolate unsafe equipment, and repair or replace the lighting fixture.
+
+DEPARTMENT: Waste Management and Sanitation
+KEYWORDS: garbage, trash, waste, dumping, overflowing bin, litter, foul smell, illegal dumping
+RESPONSIBILITIES: Collect household and commercial waste, remove illegal dumps, clean public spaces, and manage sanitation complaints.
+PRIORITY RULE: Medical waste, hazardous waste, blocked access, or a large decomposing pile is high severity.
+STANDARD ACTION: Schedule collection or cleanup, identify repeat dumping locations, and escalate sanitation hazards.
+
+DEPARTMENT: Water Supply and Sewerage
+KEYWORDS: water leak, burst pipe, sewer, sewage, drain, flooding, manhole, wastewater, stagnant water
+RESPONSIBILITIES: Maintain water mains, sewer networks, storm drains, manholes, and wastewater infrastructure.
+PRIORITY RULE: Active flooding, contaminated water, an open manhole, or sewage entering homes is high severity.
+STANDARD ACTION: Dispatch an inspection team, stop the leak or secure the manhole, and restore the network.
+
+DEPARTMENT: Parks and Public Spaces
+KEYWORDS: park, playground, public garden, tree, fallen branch, bench, public space, recreational area
+RESPONSIBILITIES: Maintain municipal parks, playgrounds, public gardens, trees, benches, and recreational assets.
+PRIORITY RULE: A fallen tree, dangerous branch, damaged playground equipment, or blocked emergency path is high severity.
+STANDARD ACTION: Isolate the hazard, dispatch parks staff, prune or remove the hazard, and repair the public asset.
+
+DEPARTMENT: Traffic and Road Safety
+KEYWORDS: traffic signal, traffic light, stop sign, road sign, crosswalk, pedestrian crossing, lane marking, obstruction
+RESPONSIBILITIES: Maintain traffic signals, road signs, markings, crosswalks, pedestrian safety infrastructure, and traffic obstructions.
+PRIORITY RULE: A failed signal at a busy intersection, missing stop sign, or dangerous obstruction is high severity.
+STANDARD ACTION: Dispatch a traffic technician, add temporary signage or traffic control, and repair the asset.
