@@ -1,14 +1,12 @@
 # CivicLens AI
 
+CivicLens AI is a multilingual civic-operations platform that turns a citizen's photo, location, and description into a structured, prioritized, department-ready complaint. It connects public reporting with department routing, duplicate detection, SLA tracking, status timelines, and resolution evidence.
+
 <p align="center">
   <a href="https://civiclensai.streamlit.app"><img src="https://img.shields.io/badge/Live%20Demo-Open%20CivicLens%20AI-e97855?style=for-the-badge&logo=streamlit&logoColor=white" alt="Open CivicLens AI live demo"></a>
   <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10 or newer">
   <img src="https://img.shields.io/badge/Streamlit-App-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit app">
 </p>
-
-CivicLens AI is a multilingual civic-operations platform that turns a citizen's photo, location, and description into a structured, prioritized, department-ready complaint. It connects public reporting with department routing, duplicate detection, SLA tracking, status timelines, and resolution evidence.
-
-> **Try it now:** press the **Open the Live Streamlit Demo** button above to launch the deployed application.
 
 ## What it does
 
