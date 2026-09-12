@@ -24,16 +24,18 @@ def _get_vector_store():
 
 def route_issue(classification: dict[str, Any], user_description: str = "", language: str = "English") -> dict[str, Any]:
     if not os.getenv("GROQ_API_KEY", "").strip():
+        urdu = language == "Urdu"
         departments = {
-            "pothole": ("Public Works and Roads", "Road damage category selected from the submitted note.", "Inspect and repair the damaged road surface."),
-            "streetlight": ("Street Lighting and Electrical Services", "Street lighting category selected from the submitted note.", "Inspect the fixture, power supply, and replace the lamp if required."),
-            "garbage": ("Waste Management and Sanitation", "Waste category selected from the submitted note.", "Arrange collection and inspect the site for recurring dumping."),
-            "water_sewer": ("Water Supply and Sewerage", "Water or drainage category selected from the submitted note.", "Inspect the drain or water line and address the leak or blockage."),
-            "park_public_space": ("Parks and Public Spaces", "Public-space category selected from the submitted note.", "Inspect and schedule maintenance for the affected public space."),
-            "traffic_safety": ("Traffic and Road Safety", "Traffic-safety category selected from the submitted note.", "Inspect the site and apply the appropriate road-safety response."),
+            "pothole": ("Public Works and Roads", "سڑک کے نقصان کی قسم شہری کی درج کردہ تفصیل کی بنیاد پر منتخب کی گئی ہے۔" if urdu else "Road damage category selected from the submitted note.", "متاثرہ سڑک کا معائنہ کرکے مرمت کی جائے۔" if urdu else "Inspect and repair the damaged road surface."),
+            "streetlight": ("Street Lighting and Electrical Services", "سٹریٹ لائٹ کی قسم درج کردہ تفصیل کی بنیاد پر منتخب کی گئی ہے۔" if urdu else "Street lighting category selected from the submitted note.", "لائٹ اور بجلی کی فراہمی کا معائنہ کیا جائے۔" if urdu else "Inspect the fixture, power supply, and replace the lamp if required."),
+            "garbage": ("Waste Management and Sanitation", "کچرے کی قسم درج کردہ تفصیل کی بنیاد پر منتخب کی گئی ہے۔" if urdu else "Waste category selected from the submitted note.", "کچرا اٹھانے کا انتظام کیا جائے اور مقام کا معائنہ کیا جائے۔" if urdu else "Arrange collection and inspect the site for recurring dumping."),
+            "water_sewer": ("Water Supply and Sewerage", "پانی یا نکاسیٔ آب کی قسم درج کردہ تفصیل کی بنیاد پر منتخب کی گئی ہے۔" if urdu else "Water or drainage category selected from the submitted note.", "نالی یا پانی کی لائن کا معائنہ کرکے رساؤ یا رکاوٹ دور کی جائے۔" if urdu else "Inspect the drain or water line and address the leak or blockage."),
+            "park_public_space": ("Parks and Public Spaces", "عوامی مقام کی قسم درج کردہ تفصیل کی بنیاد پر منتخب کی گئی ہے۔" if urdu else "Public-space category selected from the submitted note.", "متاثرہ عوامی مقام کا معائنہ کرکے دیکھ بھال کا کام مقرر کیا جائے۔" if urdu else "Inspect and schedule maintenance for the affected public space."),
+            "traffic_safety": ("Traffic and Road Safety", "ٹریفک کی حفاظت کی قسم درج کردہ تفصیل کی بنیاد پر منتخب کی گئی ہے۔" if urdu else "Traffic-safety category selected from the submitted note.", "مقام کا معائنہ کرکے مناسب حفاظتی کارروائی کی جائے۔" if urdu else "Inspect the site and apply the appropriate road-safety response."),
         }
-        department, reason, action = departments.get(classification.get("category"), ("Public Works and Roads", "The issue requires municipal review.", "Assign a coordinator for manual inspection."))
-        return {"department": department, "reason": reason, "recommended_action": action, "escalation": "Manual review required before dispatch.", "provider": "Local routing mode"}
+        default = ("Public Works and Roads", "مسئلے کے لیے بلدیاتی معائنہ ضروری ہے۔" if urdu else "The issue requires municipal review.", "معائنے کے لیے ایک رابطہ افسر مقرر کیا جائے۔" if urdu else "Assign a coordinator for manual inspection.")
+        department, reason, action = departments.get(classification.get("category"), default)
+        return {"department": department, "reason": reason, "recommended_action": action, "escalation": "بھیجنے سے پہلے انسانی جائزہ ضروری ہے۔" if urdu else "Manual review required before dispatch.", "provider": "مقامی روٹنگ" if urdu else "Local routing mode"}
     query = f"Category: {classification.get('category')} Severity: {classification.get('severity')} Evidence: {classification.get('evidence')} Description: {classification.get('description')} Citizen note: {user_description}"
     try:
         context = "\n\n".join(doc.page_content for doc in _get_vector_store().similarity_search(query, k=3))

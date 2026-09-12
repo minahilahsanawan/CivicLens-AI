@@ -185,6 +185,7 @@ if st.session_state["theme"] == "Dark":
     [data-baseweb="popover"] *, [data-baseweb="menu"] * { color: #ffffff !important; }
     .stApp [data-testid="stFileUploader"] section { background: #202328 !important; border-color: #e97855 !important; }
     .stApp [data-testid="stFileUploader"] section * { color: #f5f1ed !important; }
+    .stApp [data-testid="stFileUploader"] section button { background: #34383e !important; color: #ffffff !important; border: 1px solid #707780 !important; }
     .stApp [data-testid="stNumberInput"] button { background: #663a2e !important; color: #ffffff !important; }
     .stApp div[data-testid="stMetric"] label,
     .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"],
@@ -243,6 +244,7 @@ else:
     [data-baseweb="popover"] *, [data-baseweb="menu"] * { color: #202124 !important; }
     .stApp [data-testid="stFileUploader"] section { background: #fffdfa !important; border-color: #e97855 !important; }
     .stApp [data-testid="stFileUploader"] section * { color: #30343a !important; }
+    .stApp [data-testid="stFileUploader"] section button { background: #e97855 !important; color: #ffffff !important; border: 1px solid #e97855 !important; }
     .stApp [data-testid="stNumberInput"] button { background: #fbe0d5 !important; color: #713323 !important; }
     .stApp div[data-testid="stMetric"] label,
     .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"],
@@ -407,20 +409,28 @@ def report_page(language: str) -> None:
     if complaint.get("needs_review"): st.warning(t(language, "Low AI confidence: this case requires human review before field dispatch.", "مصنوعی ذہانت کا اعتماد کم ہے، اس لیے فیلڈ ٹیم کو بھیجنے سے پہلے انسانی جائزہ ضروری ہے۔"))
     if complaint.get("duplicate_matches"): st.warning(f"Potential duplicate detected. This report is near: {', '.join(x['ticket_id'] for x in complaint['duplicate_matches'])}")
     with st.expander(t(language, "See AI evidence and routing explanation", "AI evidence اور routing explanation دیکھیں"), expanded=True):
-        st.write(f"**AI confidence:** {complaint['confidence']:.0%}")
-        st.write(f"**AI provider:** {complaint.get('provider', 'AI')}")
-        if complaint.get("needs_review"): st.write("**Review status:** Human review required")
-        st.write(f"**Routing reason:** {complaint['routing_reason']}")
-        st.write(f"**Recommended action:** {complaint['recommended_action']}")
+        st.write(f"**{t(language, 'Analysis confidence', 'تجزیے کا اعتماد')}:** {complaint['confidence']:.0%}")
+        st.write(f"**{t(language, 'Analysis method', 'تجزیے کا طریقہ')}:** {complaint.get('provider', t(language, 'Local analysis', 'مقامی تجزیہ'))}")
+        if complaint.get("needs_review"): st.write(f"**{t(language, 'Review status', 'جائزے کی حالت')}:** {t(language, 'Human review required', 'انسانی جائزہ ضروری ہے')}")
+        st.write(f"**{t(language, 'Routing reason', 'محکمے کے انتخاب کی وجہ')}:** {complaint['routing_reason']}")
+        st.write(f"**{t(language, 'Recommended action', 'تجویز کردہ کارروائی')}:** {complaint['recommended_action']}")
 
 
 def resolution_panel(complaint: dict, language: str) -> None:
     st.subheader(t(language, "Resolution verification", "مسئلہ حل ہونے کی تصدیق"))
-    if not has_key(): st.info(t(language, "AI verification is unavailable in demo mode. You can still review the evidence manually.", "نمونہ موڈ میں مصنوعی ذہانت سے تصدیق دستیاب نہیں۔ آپ شواہد کا دستی طور پر جائزہ لے سکتے ہیں۔")); return
     after = st.file_uploader(t(language, "Upload an after-repair photo", "مرمت کے بعد کی تصویر اپ لوڈ کریں"), type=["jpg", "jpeg", "png", "webp"], key=f"after_{complaint['ticket_id']}")
-    if after and st.button(t(language, "Verify resolution", "حل کی تصدیق کریں"), key=f"verify_{complaint['ticket_id']}"):
+    if not has_key():
+        st.info(t(language, "AI verification is unavailable. Upload an after-repair photo for manual review.", "مصنوعی ذہانت سے تصدیق دستیاب نہیں۔ مرمت کے بعد کی تصویر اپ لوڈ کرکے دستی جائزے کے لیے محفوظ کریں۔"))
+    button_label = t(language, "Verify resolution", "حل کی تصدیق کریں") if has_key() else t(language, "Save evidence for manual review", "شواہد دستی جائزے کے لیے محفوظ کریں")
+    if after and st.button(button_label, key=f"verify_{complaint['ticket_id']}"):
         before_path = BASE_DIR / complaint["image_path"]
-        if not before_path.exists(): st.error("Original evidence image is unavailable."); return
+        if not before_path.exists(): st.error(t(language, "Original evidence image is unavailable.", "اصل تصویری ثبوت دستیاب نہیں ہے۔")); return
+        if not has_key():
+            stored = UPLOAD_DIR / f"resolution_{uuid.uuid4().hex}_{after.name.replace(' ', '_')}"
+            stored.write_bytes(after.getvalue())
+            save_resolution(complaint["ticket_id"], str(stored.relative_to(BASE_DIR)), 0.0)
+            st.success(t(language, "After-repair evidence saved for manual review.", "مرمت کے بعد کا تصویری ثبوت دستی جائزے کے لیے محفوظ کر دیا گیا ہے۔"))
+            return
         with st.spinner(t(language, "Comparing before and after evidence...", "مرمت سے پہلے اور بعد کے شواہد کا موازنہ کیا جا رہا ہے۔۔۔")):
             result = verify_resolution(before_path.read_bytes(), after.getvalue(), after.type, language)
             stored = UPLOAD_DIR / f"resolution_{uuid.uuid4().hex}_{after.name.replace(' ', '_')}"
@@ -442,7 +452,7 @@ def complaint_details(complaint: dict, language: str) -> None:
         if resolution and resolution.exists(): st.image(str(resolution), caption=t(language, "Resolution evidence", "حل ہونے کا تصویری ثبوت"), use_container_width=True)
     with right:
         st.write(f"**{t(language, 'Category', 'قسم')}:** {category_name(complaint['category'], language)}")
-        st.write(f"**{t(language, 'Severity', 'شدت')}:** {severity_name(complaint['severity'], language)} · **{t(language, 'AI confidence', 'مصنوعی ذہانت کا اعتماد')}:** {complaint['confidence']:.0%}")
+        st.write(f"**{t(language, 'Severity', 'شدت')}:** {severity_name(complaint['severity'], language)} · **{t(language, 'Analysis confidence', 'تجزیے کا اعتماد')}:** {complaint['confidence']:.0%}")
         st.write(f"**{t(language, 'Priority', 'ترجیح')}:** {complaint['priority_score']}/100 ({complaint['priority_label']})")
         st.write(f"**{t(language, 'Location', 'مقام')}:** {complaint['latitude']:.6f}, {complaint['longitude']:.6f}")
         deadline = sla_deadline(complaint); remaining = deadline - datetime.now(timezone.utc)
@@ -450,9 +460,11 @@ def complaint_details(complaint: dict, language: str) -> None:
         st.write(f"**{t(language, 'Description', 'تفصیل')}:** {complaint['description'] or t(language, 'No additional description.', 'مزید تفصیل درج نہیں کی گئی۔')}")
         st.write(f"**{t(language, 'Routing reason', 'محکمے کے انتخاب کی وجہ')}:** {complaint['routing_reason']}")
         st.write(f"**{t(language, 'Recommended action', 'تجویز کردہ کارروائی')}:** {complaint['recommended_action']}")
-        new_status = st.selectbox(t(language, "Update status", "حالت تبدیل کریں"), STATUS_OPTIONS, index=STATUS_OPTIONS.index(complaint["status"]), key=f"select_{complaint['ticket_id']}")
+        status_labels = [t(language, "Submitted", "جمع شدہ"), t(language, "Acknowledged", "وصولی کی تصدیق"), t(language, "In Progress", "جاری ہے"), t(language, "Resolved", "حل شدہ")]
+        selected_status_label = st.selectbox(t(language, "Update status", "حالت تبدیل کریں"), status_labels, index=STATUS_OPTIONS.index(complaint["status"]), key=f"select_{complaint['ticket_id']}")
+        new_status = STATUS_OPTIONS[status_labels.index(selected_status_label)]
         note = st.text_input(t(language, "Update note", "تبدیلی کی وجہ یا نوٹ"), key=f"note_{complaint['ticket_id']}")
-        if st.button("Save status", key=f"save_{complaint['ticket_id']}"):
+        if st.button(t(language, "Save status", "حالت محفوظ کریں"), key=f"save_{complaint['ticket_id']}"):
             update_status(complaint["ticket_id"], new_status, note); st.success(t(language, "Status updated.", "شکایت کی حالت تبدیل کر دی گئی ہے۔")); st.rerun()
         if complaint["status"] in {"Resolved", "In Progress"}:
             feedback_options = ["Resolved", "Partially resolved", "Not resolved"] if language == "English" else ["مسئلہ حل ہو گیا", "جزوی طور پر حل ہوا", "مسئلہ حل نہیں ہوا"]
@@ -460,8 +472,20 @@ def complaint_details(complaint: dict, language: str) -> None:
             feedback_value = dict(zip(feedback_options, ["Resolved", "Partially resolved", "Not resolved"]))[feedback]
             if st.button(t(language, "Submit citizen feedback", "شہری کی رائے جمع کروائیں"), key=f"feedback_btn_{complaint['ticket_id']}"):
                 save_feedback(complaint["ticket_id"], feedback_value); st.success(t(language, "Feedback recorded.", "آپ کی رائے محفوظ کر لی گئی ہے۔")); st.rerun()
-    with st.expander("Complaint timeline", expanded=True):
-        for event in get_events(complaint["ticket_id"]): st.write(f"**{event['created_at'].replace('T', ' ')}** — {event['event']} {('· ' + event['note']) if event['note'] else ''}")
+    with st.expander(t(language, "Complaint timeline", "شکایت کی پیش رفت"), expanded=True):
+        for event in get_events(complaint["ticket_id"]):
+            event_name = event["event"]
+            note = event["note"] or ""
+            if language == "Urdu":
+                if event_name == "Complaint submitted":
+                    event_name = "شکایت جمع کر دی گئی"
+                elif event_name.startswith("Status changed to "):
+                    status_value = event_name.replace("Status changed to ", "")
+                    status_urdu = {"Submitted": "جمع شدہ", "Acknowledged": "وصولی کی تصدیق", "In Progress": "جاری ہے", "Resolved": "حل شدہ"}.get(status_value, status_value)
+                    event_name = f"حالت تبدیل کر دی گئی: {status_urdu}"
+                if note.startswith("AI routed to "):
+                    note = f"مصنوعی ذہانت نے {department_name(note.replace('AI routed to ', ''), language)} کو بھیج دیا"
+            st.write(f"**{event['created_at'].replace('T', ' ')}** — {event_name} {('· ' + note) if note else ''}")
     resolution_panel(complaint, language)
 
 
@@ -480,7 +504,7 @@ def dashboard_page(language: str) -> None:
     df = pd.DataFrame(rows)
     overdue = sum(sla_deadline(r) < datetime.now(timezone.utc) and r["status"] != "Resolved" for r in rows)
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Total", len(df)); c2.metric("Open", int((df.status != "Resolved").sum())); c3.metric("High / critical", int(df.severity.isin(["high", "critical"]).sum())); c4.metric("Overdue", overdue); c5.metric("Resolved", int((df.status == "Resolved").sum()))
+    c1.metric(t(language, "Total", "کل"), len(df)); c2.metric(t(language, "Open", "کھلی شکایات"), int((df.status != "Resolved").sum())); c3.metric(t(language, "High / critical", "زیادہ یا انتہائی اہم"), int(df.severity.isin(["high", "critical"]).sum())); c4.metric(t(language, "Overdue", "مدت گزر چکی"), overdue); c5.metric(t(language, "Resolved", "حل شدہ"), int((df.status == "Resolved").sum()))
     left, right = st.columns(2)
     with left:
         st.subheader(t(language, "Issue categories", "مسائل کی اقسام"))
@@ -498,8 +522,11 @@ def dashboard_page(language: str) -> None:
     st.map(df.rename(columns={"latitude": "lat", "longitude": "lon"})[["lat", "lon"]])
     st.subheader(t(language, "Priority queue", "ترجیحی فہرست"))
     view = df.copy(); view["category"] = view["category"].str.replace("_", " ").str.title()
-    st.dataframe(view.sort_values(["priority_score", "created_at"], ascending=[False, False])[["ticket_id", "category", "severity", "priority_score", "department", "status", "sla_hours", "created_at"]], use_container_width=True, hide_index=True)
-    st.caption("Dispatch the highest-risk, oldest, or SLA-breaching cases first.")
+    table = view.sort_values(["priority_score", "created_at"], ascending=[False, False])[["ticket_id", "category", "severity", "priority_score", "department", "status", "sla_hours", "created_at"]]
+    if language == "Urdu":
+        table = table.rename(columns={"ticket_id": "شناختی نمبر", "category": "قسم", "severity": "شدت", "priority_score": "ترجیحی اسکور", "department": "محکمہ", "status": "حالت", "sla_hours": "جوابی وقت", "created_at": "جمع کروانے کا وقت"})
+    st.dataframe(table, use_container_width=True, hide_index=True)
+    st.caption(t(language, "Dispatch the highest-risk, oldest, or SLA-breaching cases first.", "زیادہ خطرے، پرانی یا مقررہ وقت سے تجاوز کرنے والی شکایات کو پہلے بھیجا جائے۔"))
 
 
 page, language = render_sidebar()
