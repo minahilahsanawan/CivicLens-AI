@@ -1,11 +1,5 @@
 # CivicLens AI
 
-### From public reports to verified action
-
-<p align="center">
-  <a href="https://civiclensai.streamlit.app"><strong>🚀 Open the Live Streamlit Demo</strong></a>
-</p>
-
 <p align="center">
   <a href="https://civiclensai.streamlit.app"><img src="https://img.shields.io/badge/Live%20Demo-Open%20CivicLens%20AI-e97855?style=for-the-badge&logo=streamlit&logoColor=white" alt="Open CivicLens AI live demo"></a>
   <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.10 or newer">
