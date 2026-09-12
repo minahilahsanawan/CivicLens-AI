@@ -22,7 +22,16 @@ def groq_text(prompt: str, model: str) -> str:
     token = key("GROQ_API_KEY")
     if not token:
         raise RuntimeError("GROQ_API_KEY is not configured.")
-    response = Groq(api_key=token).chat.completions.create(model=model, temperature=0, max_tokens=500, response_format={"type": "json_object"}, messages=[{"role": "user", "content": prompt}])
+    client = Groq(api_key=token)
+    messages = [{"role": "user", "content": prompt}]
+    try:
+        response = client.chat.completions.create(model=model, temperature=0, max_tokens=500, response_format={"type": "json_object"}, messages=messages)
+    except Exception as exc:
+        # Some Groq models reject JSON mode even when the prompt requests JSON.
+        # Retry without the API-level constraint; parse_json validates the result.
+        if "json" not in str(exc).lower() and "generation" not in str(exc).lower():
+            raise
+        response = client.chat.completions.create(model=model, temperature=0, max_tokens=500, messages=messages)
     return response.choices[0].message.content or ""
 
 
@@ -31,5 +40,14 @@ def groq_vision(prompt: str, image_parts: list[dict], model: str) -> str:
     token = key("GROQ_API_KEY")
     if not token:
         raise RuntimeError("GROQ_API_KEY is not configured.")
-    response = Groq(api_key=token).chat.completions.create(model=model, temperature=0, max_tokens=500, response_format={"type": "json_object"}, messages=[{"role": "user", "content": [{"type": "text", "text": prompt}, *image_parts]}])
+    client = Groq(api_key=token)
+    messages = [{"role": "user", "content": [{"type": "text", "text": prompt}, *image_parts]}]
+    try:
+        response = client.chat.completions.create(model=model, temperature=0, max_tokens=500, response_format={"type": "json_object"}, messages=messages)
+    except Exception as exc:
+        # Vision models may report json_validate_failed despite a valid prompt.
+        # Retry in normal mode and extract the JSON object locally.
+        if "json" not in str(exc).lower() and "generation" not in str(exc).lower():
+            raise
+        response = client.chat.completions.create(model=model, temperature=0, max_tokens=500, messages=messages)
     return response.choices[0].message.content or ""
