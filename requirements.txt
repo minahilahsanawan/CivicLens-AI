@@ -9,3 +9,5 @@ sentence-transformers>=3.0.1
 faiss-cpu>=1.8.0
 pandas>=2.2.2
 Pillow>=10.4.0
+transformers>=4.35.0
+torch>=2.0.0

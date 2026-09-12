@@ -112,6 +112,27 @@ else:
     .stApp [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color: #aebbd2 !important; }
     </style>""", unsafe_allow_html=True)
 
+# Component-level contrast pass for alerts, radios, checkboxes, links, and
+# generated controls that Streamlit renders outside the main form container.
+if st.session_state["theme"] == "Dark":
+    st.markdown("""<style>
+    .stApp [data-testid="stAlert"] { background: #30231f !important; color: #f5f1ed !important; border: 1px solid #704638 !important; }
+    .stApp [data-testid="stAlert"] *, .stApp [data-testid="stAlert"] p { color: #f5f1ed !important; }
+    .stApp a { color: #ff9a7d !important; }
+    .stApp [role="radiogroup"] label, .stApp [role="checkbox"] { color: #f5f1ed !important; }
+    .stApp [data-testid="stCheckbox"] label p, .stApp [data-testid="stRadio"] label p { color: #f5f1ed !important; }
+    .stApp [data-testid="stCodeBlock"] { background: #202328 !important; border: 1px solid #3d4249 !important; }
+    </style>""", unsafe_allow_html=True)
+else:
+    st.markdown("""<style>
+    .stApp [data-testid="stAlert"] { background: #fff8f4 !important; color: #202124 !important; border: 1px solid #efb19d !important; }
+    .stApp [data-testid="stAlert"] *, .stApp [data-testid="stAlert"] p { color: #202124 !important; }
+    .stApp a { color: #a33e25 !important; }
+    .stApp [role="radiogroup"] label, .stApp [role="checkbox"] { color: #202124 !important; }
+    .stApp [data-testid="stCheckbox"] label p, .stApp [data-testid="stRadio"] label p { color: #202124 !important; }
+    .stApp [data-testid="stCodeBlock"] { background: #fffdfa !important; border: 1px solid #dfd5cc !important; }
+    </style>""", unsafe_allow_html=True)
+
 # Final accessible theme override. It intentionally comes after every earlier
 # style block so Streamlit's generated widget rules cannot hide text.
 if st.session_state["theme"] == "Dark":
@@ -338,7 +359,7 @@ def render_sidebar() -> tuple[str, str]:
         st.divider()
         st.markdown(t(language, "**AI workflow**", "**مصنوعی ذہانت کا طریقۂ کار**"))
         st.caption(t(language, "Image analysis → department routing → priority scoring → resolution verification", "تصویر کا تجزیہ → متعلقہ محکمے کا انتخاب → ترجیح مقرر کرنا → حل کی تصدیق"))
-        if not has_key(): st.warning(t(language, "Add GROQ_API_KEY to enable complaint analysis.", "شکایت کے تجزیے کے لیے GROQ_API_KEY شامل کریں۔"))
+        if not has_key(): st.info(t(language, "Demo mode is active. Add GROQ_API_KEY only if you want live image analysis.", "نمونہ موڈ فعال ہے۔ حقیقی تصویری تجزیے کے لیے GROQ_API_KEY شامل کریں۔"))
         st.caption(t(language, "Civic service operations workspace", "شہری خدمات کے انتظام کا مرکز"))
     page_map = dict(zip(page_labels, ["Report issue", "Track complaints", "Operations dashboard"]))
     return page_map[page], language
@@ -366,7 +387,6 @@ def report_page(language: str) -> None:
     if not submit: return
     if image is None: st.error(t(language, "Please upload a photo.", "براہ کرم تصویر اپ لوڈ کریں۔")); return
     if not consent: st.error(t(language, "Please confirm the reporting consent.", "براہ کرم شکایت درج کرنے کی رضامندی کی تصدیق کریں۔")); return
-    if not has_key(): st.error(t(language, "GROQ_API_KEY is required before submitting a complaint.", "شکایت جمع کروانے سے پہلے GROQ_API_KEY شامل کرنا ضروری ہے۔")); return
     with st.spinner(t(language, "Analyzing evidence, retrieving department policy, and calculating priority...", "تصویر کا تجزیہ اور درست department کی تلاش جاری ہے...")):
         try:
             classification = classify_image(image.getvalue(), image.type, description, language)
