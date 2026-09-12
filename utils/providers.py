@@ -22,7 +22,7 @@ def groq_text(prompt: str, model: str) -> str:
     token = key("GROQ_API_KEY")
     if not token:
         raise RuntimeError("GROQ_API_KEY is not configured.")
-    response = Groq(api_key=token).chat.completions.create(model=model, temperature=0, max_tokens=500, messages=[{"role": "user", "content": prompt}])
+    response = Groq(api_key=token).chat.completions.create(model=model, temperature=0, max_tokens=500, response_format={"type": "json_object"}, messages=[{"role": "user", "content": prompt}])
     return response.choices[0].message.content or ""
 
 
@@ -31,5 +31,5 @@ def groq_vision(prompt: str, image_parts: list[dict], model: str) -> str:
     token = key("GROQ_API_KEY")
     if not token:
         raise RuntimeError("GROQ_API_KEY is not configured.")
-    response = Groq(api_key=token).chat.completions.create(model=model, temperature=0, max_tokens=500, messages=[{"role": "user", "content": [{"type": "text", "text": prompt}, *image_parts]}])
+    response = Groq(api_key=token).chat.completions.create(model=model, temperature=0, max_tokens=500, response_format={"type": "json_object"}, messages=[{"role": "user", "content": [{"type": "text", "text": prompt}, *image_parts]}])
     return response.choices[0].message.content or ""

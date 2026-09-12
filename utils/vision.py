@@ -4,7 +4,7 @@ from typing import Any
 
 from .providers import groq_vision, parse_json
 
-REQUESTED_GROQ_VISION_MODEL = "llama-3.2-11b-vision-preview"
+REQUESTED_GROQ_VISION_MODEL = "qwen/qwen3.6-27b"
 GROQ_VISION_MODEL = os.getenv("GROQ_VISION_MODEL", REQUESTED_GROQ_VISION_MODEL)
 
 

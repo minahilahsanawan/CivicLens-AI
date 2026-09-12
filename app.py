@@ -89,6 +89,201 @@ div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-size: 1.55rem !
 theme_vars = {"Light": ("#f6f2ed", "#202124", "#58616b", "#fffdfa", "#fffdfa", "#dfd5cc", "#a8afb6", "#dfd5cc"), "Dark": ("#17191d", "#f5f1ed", "#c6bdb7", "#24272c", "#202328", "#3d4249", "#9c948f", "#302f2d")}[st.session_state["theme"]]
 st.markdown(THEME_CSS.replace("var(--page-bg)", theme_vars[0]).replace("var(--body-text)", theme_vars[1]).replace("var(--muted-text)", theme_vars[2]).replace("var(--card-bg)", theme_vars[3]).replace("var(--control-bg)", theme_vars[4]).replace("var(--border)", theme_vars[5]).replace("var(--placeholder)", theme_vars[6]).replace("var(--accent)", "#e97855"), unsafe_allow_html=True)
 
+# These selectors intentionally have higher specificity than Streamlit's generated
+# markdown selectors, which otherwise make dark-mode descriptions disappear.
+if st.session_state["theme"] == "Dark":
+    st.markdown("""<style>
+    .stApp .hero p, .stApp .card b, .stApp .small-muted { color: #f5f1ed !important; }
+    .stApp .stMarkdown p, .stApp [data-testid="stCaptionContainer"] p,
+    .stApp [data-testid="stWidgetLabel"] p { color: #f5f1ed !important; }
+    .stApp [data-testid="stSidebar"] .stMarkdown p,
+    .stApp [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p,
+    .stApp [data-testid="stSidebar"] label { color: #f5f1ed !important; }
+    .stApp [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color: #c6bdb7 !important; }
+    </style>""", unsafe_allow_html=True)
+else:
+    st.markdown("""<style>
+    .stApp .hero p { color: #f4d6c8 !important; }
+    .stApp .card b, .stApp .small-muted, .stApp .stMarkdown p,
+    .stApp [data-testid="stCaptionContainer"] p,
+    .stApp [data-testid="stWidgetLabel"] p { color: #30343a !important; }
+    .stApp [data-testid="stSidebar"] .stMarkdown p,
+    .stApp [data-testid="stSidebar"] label { color: #edf3ff !important; }
+    .stApp [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color: #aebbd2 !important; }
+    </style>""", unsafe_allow_html=True)
+
+# Final accessible theme override. It intentionally comes after every earlier
+# style block so Streamlit's generated widget rules cannot hide text.
+if st.session_state["theme"] == "Dark":
+    st.markdown("""<style>
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+        background: #17191d !important;
+        color: #f5f1ed !important;
+    }
+    [data-testid="stSidebar"] {
+        background: #101214 !important;
+        border-right: 1px solid #34383e !important;
+    }
+    [data-testid="stSidebar"] * { color: #f5f1ed !important; }
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color: #c9c1bb !important; }
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp p,
+    .stApp label, .stApp li, .stApp span, .stApp small { color: #f5f1ed !important; }
+    .stApp .hero {
+        background: linear-gradient(135deg, #24262a 0%, #422b23 100%) !important;
+        border: 1px solid #704638 !important;
+    }
+    .stApp .hero h1, .stApp .hero p { color: #ffffff !important; }
+    .stApp .hero .eyebrow { color: #ff896b !important; }
+    .stApp .card, .stApp div[data-testid="stMetric"],
+    .stApp [data-testid="stExpander"] details,
+    .stApp [data-testid="stExpander"] summary {
+        background: #24272c !important;
+        color: #f5f1ed !important;
+        border-color: #3d4249 !important;
+    }
+    .stApp .card *, .stApp .small-muted { color: #d9d1cb !important; }
+    .stApp .card b, .stApp .ticket-id { color: #ffffff !important; }
+    .stApp .ticket {
+        background: #2f2421 !important;
+        color: #f5f1ed !important;
+        border-color: #e97855 !important;
+    }
+    .stApp .ticket *, .stApp .chip { color: #ffffff !important; }
+    .stApp .chip { background: #663a2e !important; border: 1px solid #9b5b46 !important; }
+    .stApp input, .stApp textarea,
+    .stApp [data-baseweb="input"], .stApp [data-baseweb="textarea"],
+    .stApp [data-baseweb="select"] > div {
+        background: #202328 !important;
+        color: #ffffff !important;
+        border-color: #60666e !important;
+    }
+    .stApp input::placeholder, .stApp textarea::placeholder { color: #b8b0aa !important; opacity: 1 !important; }
+    .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *,
+    .stApp [data-baseweb="textarea"] * { color: #ffffff !important; }
+    [data-baseweb="popover"], [data-baseweb="menu"] { background: #24272c !important; }
+    [data-baseweb="popover"] *, [data-baseweb="menu"] * { color: #ffffff !important; }
+    .stApp [data-testid="stFileUploader"] section { background: #202328 !important; border-color: #e97855 !important; }
+    .stApp [data-testid="stFileUploader"] section * { color: #f5f1ed !important; }
+    .stApp [data-testid="stNumberInput"] button { background: #663a2e !important; color: #ffffff !important; }
+    .stApp div[data-testid="stMetric"] label,
+    .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"],
+    .stApp div[data-testid="stMetric"] [data-testid="stMetricDelta"] { color: #ffffff !important; }
+    .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-size: 1.45rem !important; }
+    .stApp .stButton > button { background: #24272c !important; color: #ffffff !important; border-color: #60666e !important; }
+    .stApp .stButton > button[kind="primary"] { background: #e97855 !important; color: #ffffff !important; border-color: #e97855 !important; }
+    </style>""", unsafe_allow_html=True)
+else:
+    st.markdown("""<style>
+    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+        background: #f6f2ed !important;
+        color: #202124 !important;
+    }
+    [data-testid="stSidebar"] {
+        background: #fffdfa !important;
+        border-right: 1px solid #dfd5cc !important;
+    }
+    [data-testid="stSidebar"] * { color: #202124 !important; }
+    [data-testid="stSidebar"] [data-testid="stCaptionContainer"] p { color: #687078 !important; }
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp p,
+    .stApp label, .stApp li, .stApp span, .stApp small { color: #202124 !important; }
+    .stApp .hero {
+        background: linear-gradient(135deg, #24262a 0%, #422b23 100%) !important;
+        border: 1px solid #704638 !important;
+    }
+    .stApp .hero h1, .stApp .hero p { color: #ffffff !important; }
+    .stApp .hero .eyebrow { color: #ff896b !important; }
+    .stApp .card, .stApp div[data-testid="stMetric"],
+    .stApp [data-testid="stExpander"] details,
+    .stApp [data-testid="stExpander"] summary {
+        background: #fffdfa !important;
+        color: #202124 !important;
+        border-color: #dfd5cc !important;
+    }
+    .stApp .card *, .stApp .small-muted { color: #30343a !important; }
+    .stApp .card b, .stApp .ticket-id { color: #202124 !important; }
+    .stApp .ticket {
+        background: #fff1eb !important;
+        color: #202124 !important;
+        border-color: #e97855 !important;
+    }
+    .stApp .ticket *, .stApp .chip { color: #713323 !important; }
+    .stApp .chip { background: #fbe0d5 !important; border: 1px solid #efb19d !important; }
+    .stApp input, .stApp textarea,
+    .stApp [data-baseweb="input"], .stApp [data-baseweb="textarea"],
+    .stApp [data-baseweb="select"] > div {
+        background: #fffdfa !important;
+        color: #202124 !important;
+        border-color: #dfd5cc !important;
+    }
+    .stApp input::placeholder, .stApp textarea::placeholder { color: #7c858d !important; opacity: 1 !important; }
+    .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *,
+    .stApp [data-baseweb="textarea"] * { color: #202124 !important; }
+    [data-baseweb="popover"], [data-baseweb="menu"] { background: #fffdfa !important; }
+    [data-baseweb="popover"] *, [data-baseweb="menu"] * { color: #202124 !important; }
+    .stApp [data-testid="stFileUploader"] section { background: #fffdfa !important; border-color: #e97855 !important; }
+    .stApp [data-testid="stFileUploader"] section * { color: #30343a !important; }
+    .stApp [data-testid="stNumberInput"] button { background: #fbe0d5 !important; color: #713323 !important; }
+    .stApp div[data-testid="stMetric"] label,
+    .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"],
+    .stApp div[data-testid="stMetric"] [data-testid="stMetricDelta"] { color: #202124 !important; }
+    .stApp div[data-testid="stMetric"] [data-testid="stMetricValue"] { font-size: 1.45rem !important; }
+    .stApp .stButton > button { background: #fffdfa !important; color: #202124 !important; border-color: #dfd5cc !important; }
+    .stApp .stButton > button[kind="primary"] { background: #e97855 !important; color: #ffffff !important; border-color: #e97855 !important; }
+    </style>""", unsafe_allow_html=True)
+
+
+# Last-pass contrast rules for Streamlit's generated elements.
+if st.session_state["theme"] == "Dark":
+    st.markdown("""<style>
+    div[data-testid="stAppViewContainer"] div.hero h1,
+    div[data-testid="stAppViewContainer"] div.hero p { color: #ffffff !important; }
+    div[data-testid="stAppViewContainer"] div.hero .eyebrow { color: #ff896b !important; }
+    div[data-testid="stAppViewContainer"] div.card,
+    div[data-testid="stAppViewContainer"] div[data-testid="stMetric"],
+    div[data-testid="stAppViewContainer"] div[data-testid="stExpander"] {
+        background: #24272c !important; color: #f5f1ed !important;
+    }
+    div[data-testid="stAppViewContainer"] div.card *,
+    div[data-testid="stAppViewContainer"] div[data-testid="stMetric"] *,
+    div[data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] p,
+    div[data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"] p {
+        color: #f5f1ed !important;
+    }
+    div[data-testid="stAppViewContainer"] input,
+    div[data-testid="stAppViewContainer"] textarea,
+    div[data-testid="stAppViewContainer"] [data-baseweb="select"] > div,
+    div[data-testid="stAppViewContainer"] [data-testid="stFileUploader"] section {
+        background: #202328 !important; color: #ffffff !important;
+    }
+    div[data-testid="stAppViewContainer"] input::placeholder,
+    div[data-testid="stAppViewContainer"] textarea::placeholder { color: #b8b0aa !important; }
+    </style>""", unsafe_allow_html=True)
+else:
+    st.markdown("""<style>
+    div[data-testid="stAppViewContainer"] div.hero h1,
+    div[data-testid="stAppViewContainer"] div.hero p { color: #ffffff !important; }
+    div[data-testid="stAppViewContainer"] div.hero .eyebrow { color: #ff896b !important; }
+    div[data-testid="stAppViewContainer"] div.card,
+    div[data-testid="stAppViewContainer"] div[data-testid="stMetric"],
+    div[data-testid="stAppViewContainer"] div[data-testid="stExpander"] {
+        background: #fffdfa !important; color: #202124 !important;
+    }
+    div[data-testid="stAppViewContainer"] div.card *,
+    div[data-testid="stAppViewContainer"] div[data-testid="stMetric"] *,
+    div[data-testid="stAppViewContainer"] [data-testid="stWidgetLabel"] p,
+    div[data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"] p {
+        color: #202124 !important;
+    }
+    div[data-testid="stAppViewContainer"] input,
+    div[data-testid="stAppViewContainer"] textarea,
+    div[data-testid="stAppViewContainer"] [data-baseweb="select"] > div,
+    div[data-testid="stAppViewContainer"] [data-testid="stFileUploader"] section {
+        background: #fffdfa !important; color: #202124 !important;
+    }
+    div[data-testid="stAppViewContainer"] input::placeholder,
+    div[data-testid="stAppViewContainer"] textarea::placeholder { color: #7c858d !important; }
+    </style>""", unsafe_allow_html=True)
+
 
 def t(language: str, english: str, urdu: str) -> str:
     return urdu if language == "Urdu" else english

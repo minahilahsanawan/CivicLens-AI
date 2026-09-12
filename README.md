@@ -132,7 +132,7 @@ Open `.env` and replace the example values:
 
 ```env
 GROQ_API_KEY=your_real_groq_key_here
-GROQ_VISION_MODEL=llama-3.2-11b-vision-preview
+GROQ_VISION_MODEL=qwen/qwen3.6-27b
 GROQ_RAG_MODEL=llama-3.1-8b-instant
 ```
 
@@ -223,7 +223,7 @@ If GitHub asks for authentication, use GitHub Desktop, Git Credential Manager, o
 
 ```toml
 GROQ_API_KEY = "your_real_groq_key_here"
-GROQ_VISION_MODEL = "llama-3.2-11b-vision-preview"
+GROQ_VISION_MODEL = "qwen/qwen3.6-27b"
 GROQ_RAG_MODEL = "llama-3.1-8b-instant"
 ```
 
