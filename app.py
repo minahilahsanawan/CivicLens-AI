@@ -181,6 +181,14 @@ if st.session_state["theme"] == "Dark":
     .stApp input::placeholder, .stApp textarea::placeholder { color: #b8b0aa !important; opacity: 1 !important; }
     .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *,
     .stApp [data-baseweb="textarea"] * { color: #ffffff !important; }
+    .stApp [data-baseweb="select"] > div > div,
+    .stApp [data-baseweb="select"] > div > div > div { background: #202328 !important; color: #ffffff !important; }
+    .stApp [data-baseweb="select"] svg { fill: #ffffff !important; color: #ffffff !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] > div,
+    [data-testid="stSidebar"] [data-baseweb="select"] > div > div,
+    [data-testid="stSidebar"] [data-baseweb="select"] > div > div > div,
+    [data-testid="stSidebar"] [data-baseweb="select"] button { background: #202328 !important; color: #ffffff !important; border-color: #60666e !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] svg { fill: #ffffff !important; color: #ffffff !important; }
     [data-baseweb="popover"], [data-baseweb="menu"] { background: #24272c !important; }
     [data-baseweb="popover"] *, [data-baseweb="menu"] * { color: #ffffff !important; }
     .stApp [data-testid="stFileUploader"] section { background: #202328 !important; border-color: #e97855 !important; }
@@ -240,6 +248,14 @@ else:
     .stApp input::placeholder, .stApp textarea::placeholder { color: #7c858d !important; opacity: 1 !important; }
     .stApp [data-baseweb="select"] *, .stApp [data-baseweb="input"] *,
     .stApp [data-baseweb="textarea"] * { color: #202124 !important; }
+    .stApp [data-baseweb="select"] > div > div,
+    .stApp [data-baseweb="select"] > div > div > div { background: #fffdfa !important; color: #202124 !important; }
+    .stApp [data-baseweb="select"] svg { fill: #202124 !important; color: #202124 !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] > div,
+    [data-testid="stSidebar"] [data-baseweb="select"] > div > div,
+    [data-testid="stSidebar"] [data-baseweb="select"] > div > div > div,
+    [data-testid="stSidebar"] [data-baseweb="select"] button { background: #fffdfa !important; color: #202124 !important; border-color: #cfc7c0 !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] svg { fill: #202124 !important; color: #202124 !important; }
     [data-baseweb="popover"], [data-baseweb="menu"] { background: #fffdfa !important; }
     [data-baseweb="popover"] *, [data-baseweb="menu"] * { color: #202124 !important; }
     .stApp [data-testid="stFileUploader"] section { background: #fffdfa !important; border-color: #e97855 !important; }
@@ -372,7 +388,7 @@ def header(eyebrow: str, title: str, subtitle: str) -> None:
 
 
 def report_page(language: str) -> None:
-    header("Citizen portal", t(language, "Report a civic issue", "شہری مسئلہ رپورٹ کریں"), t(language, "Turn a photo into a prioritized, department-ready work order.", "اپنی تصویر کو ترجیحی بنیاد پر متعلقہ محکمے کے لیے قابلِ عمل کام میں تبدیل کریں۔"))
+    header(t(language, "Citizen portal", "شہری پورٹل"), t(language, "Report a civic issue", "شہری مسئلہ رپورٹ کریں"), t(language, "Turn a photo into a prioritized, department-ready work order.", "اپنی تصویر کو ترجیحی بنیاد پر متعلقہ محکمے کے لیے قابلِ عمل کام میں تبدیل کریں۔"))
     with st.form("report_form"):
         left, right = st.columns([1.1, 1])
         with left:
@@ -442,7 +458,10 @@ def resolution_panel(complaint: dict, language: str) -> None:
 
 
 def complaint_details(complaint: dict, language: str) -> None:
-    st.markdown(f"<div class='ticket'><div class='ticket-id'>{complaint['ticket_id']}</div><span class='chip'>{complaint['status']}</span><span class='chip'>{complaint['priority_label']} priority</span><span class='chip'>{complaint['department']}</span></div>", unsafe_allow_html=True)
+    status_display = {"Submitted": "جمع شدہ", "Acknowledged": "وصولی کی تصدیق", "In Progress": "جاری ہے", "Resolved": "حل شدہ"}.get(complaint["status"], complaint["status"]) if language == "Urdu" else complaint["status"]
+    priority_display = f"{complaint['priority_label']} ترجیح" if language == "Urdu" else f"{complaint['priority_label']} priority"
+    department_display = department_name(complaint["department"], language)
+    st.markdown(f"<div class='ticket'><div class='ticket-id'>{complaint['ticket_id']}</div><span class='chip'>{status_display}</span><span class='chip'>{priority_display}</span><span class='chip'>{department_display}</span></div>", unsafe_allow_html=True)
     st.write("")
     left, right = st.columns([1, 1.25])
     with left:
@@ -456,7 +475,8 @@ def complaint_details(complaint: dict, language: str) -> None:
         st.write(f"**{t(language, 'Priority', 'ترجیح')}:** {complaint['priority_score']}/100 ({complaint['priority_label']})")
         st.write(f"**{t(language, 'Location', 'مقام')}:** {complaint['latitude']:.6f}, {complaint['longitude']:.6f}")
         deadline = sla_deadline(complaint); remaining = deadline - datetime.now(timezone.utc)
-        st.write(f"**{t(language, 'SLA deadline', 'مقررہ وقت کی آخری حد')}:** {deadline.strftime('%Y-%m-%d %H:%M UTC')} · {'Overdue' if remaining.total_seconds() < 0 else str(remaining).split('.')[0] + ' remaining'}")
+        remaining_text = t(language, "Overdue", "مدت گزر چکی ہے") if remaining.total_seconds() < 0 else str(remaining).split('.')[0] + (" باقی" if language == "Urdu" else " remaining")
+        st.write(f"**{t(language, 'SLA deadline', 'مقررہ وقت کی آخری حد')}:** {deadline.strftime('%Y-%m-%d %H:%M UTC')} · {remaining_text}")
         st.write(f"**{t(language, 'Description', 'تفصیل')}:** {complaint['description'] or t(language, 'No additional description.', 'مزید تفصیل درج نہیں کی گئی۔')}")
         st.write(f"**{t(language, 'Routing reason', 'محکمے کے انتخاب کی وجہ')}:** {complaint['routing_reason']}")
         st.write(f"**{t(language, 'Recommended action', 'تجویز کردہ کارروائی')}:** {complaint['recommended_action']}")
@@ -490,15 +510,43 @@ def complaint_details(complaint: dict, language: str) -> None:
 
 
 def track_page(language: str) -> None:
-    header("Case management", t(language, "Track complaints", "شکایات دیکھیں"), t(language, "Follow every case from submission to verified resolution.", "ہر شکایت کی پیش رفت جمع کروانے سے لے کر حل ہونے کی تصدیق تک دیکھیں۔"))
+    header(t(language, "Case management", "شکایات کا انتظام"), t(language, "Track complaints", "شکایات دیکھیں"), t(language, "Follow every case from submission to verified resolution.", "ہر شکایت کی پیش رفت جمع کروانے سے لے کر حل ہونے کی تصدیق تک دیکھیں۔"))
     rows = get_complaints()
     if not rows: st.info(t(language, "No complaints submitted yet.", "ابھی تک کوئی شکایت جمع نہیں ہوئی۔")); return
     selected = st.selectbox(t(language, "Select ticket", "شکایت کا شناختی نمبر منتخب کریں"), [r["ticket_id"] for r in rows])
     complaint_details(get_complaint(selected), language)
 
 
+def themed_chart(chart):
+    if st.session_state["theme"] == "Dark":
+        return chart.configure(
+            background="#17191d",
+            padding={"left": 12, "right": 18, "top": 12, "bottom": 12},
+        ).configure_view(
+            fill="#24272c", stroke="#3d4249"
+        ).configure_axis(
+            labelColor="#f5f1ed", titleColor="#f5f1ed",
+            gridColor="#3d4249", domainColor="#60666e",
+            tickColor="#60666e"
+        ).configure_legend(
+            labelColor="#f5f1ed", titleColor="#f5f1ed"
+        ).configure_title(color="#ffffff")
+    return chart.configure(
+        background="#f6f2ed",
+        padding={"left": 12, "right": 18, "top": 12, "bottom": 12},
+    ).configure_view(
+        fill="#fffdfa", stroke="#dfd5cc"
+    ).configure_axis(
+        labelColor="#30343a", titleColor="#30343a",
+        gridColor="#e5e0da", domainColor="#b9b0a8",
+        tickColor="#b9b0a8"
+    ).configure_legend(
+        labelColor="#30343a", titleColor="#30343a"
+    ).configure_title(color="#202124")
+
+
 def dashboard_page(language: str) -> None:
-    header("Municipal operations", t(language, "Operations dashboard", "عملیاتی ڈیش بورڈ"), t(language, "Prioritize field work, monitor SLAs, and measure public-service performance.", "میدانی کام کو ترجیح دیں، مقررہ جوابی اوقات کی نگرانی کریں اور عوامی خدمت کی کارکردگی ناپیں۔"))
+    header(t(language, "Municipal operations", "بلدیاتی کارروائیاں"), t(language, "Operations dashboard", "عملیاتی ڈیش بورڈ"), t(language, "Prioritize field work, monitor SLAs, and measure public-service performance.", "میدانی کام کو ترجیح دیں، مقررہ جوابی اوقات کی نگرانی کریں اور عوامی خدمت کی کارکردگی ناپیں۔"))
     rows = get_complaints()
     if not rows: st.info(t(language, "Submit a complaint to populate the dashboard.", "ڈیش بورڈ پر معلومات دیکھنے کے لیے پہلے ایک شکایت جمع کروائیں۔")); return
     df = pd.DataFrame(rows)
@@ -510,16 +558,25 @@ def dashboard_page(language: str) -> None:
         st.subheader(t(language, "Issue categories", "مسائل کی اقسام"))
         chart_data = df["category"].value_counts().rename_axis("category").reset_index(name="reports")
         chart_data["label"] = chart_data["category"].map(lambda value: category_name(value, language))
-        chart = alt.Chart(chart_data).mark_bar(color="#e97855", cornerRadiusTopLeft=5, cornerRadiusTopRight=5).encode(x=alt.X("label:N", sort="-y", title=None, axis=alt.Axis(labelAngle=-25)), y=alt.Y("reports:Q", title=t(language, "Reports", "شکایات")), tooltip=[alt.Tooltip("label:N", title=t(language, "Category", "قسم")), alt.Tooltip("reports:Q", title=t(language, "Reports", "شکایات"))]).properties(height=280)
+        chart = themed_chart(alt.Chart(chart_data).mark_bar(color="#e97855", cornerRadiusEnd=5).encode(
+            y=alt.Y("label:N", sort="-x", title=None, axis=alt.Axis(labelLimit=240, labelPadding=8)),
+            x=alt.X("reports:Q", title=t(language, "Reports", "شکایات"), axis=alt.Axis(format="d")),
+            tooltip=[alt.Tooltip("label:N", title=t(language, "Category", "قسم")), alt.Tooltip("reports:Q", title=t(language, "Reports", "شکایات"))]
+        ).properties(height=max(220, 54 * len(chart_data))))
         st.altair_chart(chart, use_container_width=True)
     with right:
         st.subheader(t(language, "Department workload", "محکموں کا کام"))
         department_data = df["department"].value_counts().rename_axis("department").reset_index(name="reports")
         department_data["label"] = department_data["department"].map(lambda value: department_name(value, language))
-        chart = alt.Chart(department_data).mark_bar(color="#30343a", cornerRadiusTopLeft=5, cornerRadiusTopRight=5).encode(x=alt.X("label:N", sort="-y", title=None, axis=alt.Axis(labelAngle=-25)), y=alt.Y("reports:Q", title=t(language, "Reports", "شکایات")), tooltip=[alt.Tooltip("label:N", title=t(language, "Department", "محکمہ")), alt.Tooltip("reports:Q", title=t(language, "Reports", "شکایات"))]).properties(height=280)
+        chart = themed_chart(alt.Chart(department_data).mark_bar(color="#e97855", cornerRadiusEnd=5).encode(
+            y=alt.Y("label:N", sort="-x", title=None, axis=alt.Axis(labelLimit=260, labelPadding=8)),
+            x=alt.X("reports:Q", title=t(language, "Reports", "شکایات"), axis=alt.Axis(format="d")),
+            tooltip=[alt.Tooltip("label:N", title=t(language, "Department", "محکمہ")), alt.Tooltip("reports:Q", title=t(language, "Reports", "شکایات"))]
+        ).properties(height=max(220, 54 * len(department_data))))
         st.altair_chart(chart, use_container_width=True)
     st.subheader(t(language, "Civic issue map", "شہری مسائل کا نقشہ"))
     st.map(df.rename(columns={"latitude": "lat", "longitude": "lon"})[["lat", "lon"]])
+    st.caption(t(language, "This map shows the reported locations of civic issues and helps identify nearby or duplicate reports.", "یہ نقشہ درج شدہ شہری مسائل کے مقامات دکھاتا ہے اور قریب موجود یا ایک جیسے مسائل کی شناخت میں مدد دیتا ہے۔"))
     st.subheader(t(language, "Priority queue", "ترجیحی فہرست"))
     view = df.copy(); view["category"] = view["category"].str.replace("_", " ").str.title()
     table = view.sort_values(["priority_score", "created_at"], ascending=[False, False])[["ticket_id", "category", "severity", "priority_score", "department", "status", "sla_hours", "created_at"]]
